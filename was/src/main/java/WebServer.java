@@ -9,7 +9,7 @@ import java.util.Map;
 public class WebServer {
     private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
     private static final int DEFAULT_PORT = 8080;
-    private static final int BACK_LOG = 5;
+    private static final int BACK_LOG = 1000;
     private static BufferedReader bufferedReader = null;
     private static  ServerSocket serverSocket = null;
     private static final Map<String,String> httpHeader = new HashMap<>();
@@ -23,13 +23,17 @@ public class WebServer {
                     ,BACK_LOG
             );
             logger.info("WebServer Started {} port",DEFAULT_PORT);
-
+            int count = 0;
+            Socket client = null;
             // 연결대기
-            Socket client = serverSocket.accept();
-            logger.info("{} : success",client.getInetAddress());
+            while(count<7){
+                client = serverSocket.accept();
+                count++;
+                logger.info("{} : success",client.hashCode());
+            }
+            logger.info("processing :{}",client.hashCode());
             InputStream inputStream = client.getInputStream();
             BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
-            // httpHeader 파싱
             parseHttpRequestHeader(br);
 
             // httpBody 파싱
